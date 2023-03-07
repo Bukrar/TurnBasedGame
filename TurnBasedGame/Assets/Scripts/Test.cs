@@ -4,16 +4,19 @@ using UnityEngine;
 
 public class Test : MonoBehaviour
 {
-
+    [SerializeField] Unit unit;
 
     void Start()
     {
-        
+
     }
 
     private void Update()
     {
-       
+        if (Input.GetKeyDown(KeyCode.T))
+        {
+
+        }
     }
 
 }
