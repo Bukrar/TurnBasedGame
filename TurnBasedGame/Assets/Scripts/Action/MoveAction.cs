@@ -6,11 +6,10 @@ using UnityEngine;
 
 public class MoveAction : ActionBase
 {
-    private Action onActionComplete;
+    public event EventHandler OnStartMoving;
+    public event EventHandler OnStopMoving;
 
     private Vector3 targetPosition;
-    [SerializeField]
-    private Animator unitAnimator;
     [SerializeField]
     private int maxMoveDistance = 4;
 
@@ -33,15 +32,11 @@ public class MoveAction : ActionBase
         {
             float moveSpeed = 4f;
             transform.position += moveDirection * moveSpeed * Time.deltaTime;
-
-
-            unitAnimator.SetBool("IsWalking", true);
         }
         else
         {
-            unitAnimator.SetBool("IsWalking", false); 
-            isActive = false;
-            onActionComplete();
+            OnStopMoving?.Invoke(this, EventArgs.Empty);
+            ActionComplete();
         }
 
         float rotateSpeed = 10f;
@@ -51,12 +46,12 @@ public class MoveAction : ActionBase
 
     public override void TakeAction(GridPosition gridPosition ,Action onActionComplete)
     {
-        this.onActionComplete = onActionComplete;
-        isActive = true;
-        this.targetPosition = LevelGrid.Instance.GetWorldPosition(gridPosition);
+        this.targetPosition = LevelGrid.Instance.GetWorldPosition(gridPosition); 
+        OnStartMoving?.Invoke(this, EventArgs.Empty);
+        ActionStart(onActionComplete);
     }
 
-    public override List<GridPosition> GetValidGridPositionList()
+    public override List<GridPosition> GetValidActionGridPositionList()
     {
         List<GridPosition> validGridPositionList = new List<GridPosition>();
         GridPosition unitGridPosition = unit.GetGridPosition();
@@ -91,4 +86,16 @@ public class MoveAction : ActionBase
     {
         return base.GetActionPointsCost();
     }
+
+    public override EnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
+    {
+        int targetCountAtGridPosition = unit.GetShootAction().GetTargetCountAtPosition(gridPosition);
+
+        return new EnemyAIAction
+        {
+            gridPosition = gridPosition,
+            actionValue = targetCountAtGridPosition * 10,
+        };
+    }
+
 }

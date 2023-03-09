@@ -4,15 +4,12 @@ using UnityEngine;
 
 public class SpinAction : ActionBase
 {
-    private Action onActionComplete;
-
     private float totalSpinAmount;
 
     protected override void Awake()
     {
         base.Awake();
     }
-
 
     void Update()
     {
@@ -27,18 +24,16 @@ public class SpinAction : ActionBase
         totalSpinAmount += spinAddAmount;
         if (totalSpinAmount > 360f)
         {
-            isActive = false;
-            onActionComplete();
+            ActionComplete();
         }
     }
 
     public override void TakeAction(GridPosition gridPosition, Action onActionComplete)
     {
-        this.onActionComplete = onActionComplete;
-        isActive = true;
         totalSpinAmount = 0f;
+        ActionStart(onActionComplete);
     }
-    public override List<GridPosition> GetValidGridPositionList()
+    public override List<GridPosition> GetValidActionGridPositionList()
     {
         GridPosition unitGridPosition = unit.GetGridPosition();
         return new List<GridPosition> { unitGridPosition };
@@ -53,4 +48,14 @@ public class SpinAction : ActionBase
     {
         return 2;
     }
+
+    public override EnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
+    {
+        return new EnemyAIAction
+        {
+            gridPosition = gridPosition,
+            actionValue = 0,
+        };
+    }
+
 }
