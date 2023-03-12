@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.TextCore.Text;
 
 public class Unit : MonoBehaviour
 {
@@ -13,10 +14,6 @@ public class Unit : MonoBehaviour
     public static event EventHandler OnAnyActionPointsChanged;
 
     private GridPosition gridPosition;
-
-    private MoveAction moveAction;
-    private SpinAction spinAction;
-    private ShotAction shootAction;
     private HealSystem healSystem;
     private ActionBase[] actionBaseArray;
 
@@ -28,9 +25,6 @@ public class Unit : MonoBehaviour
     private void Awake()
     {
         healSystem = GetComponent<HealSystem>();
-        moveAction = GetComponent<MoveAction>();
-        spinAction = GetComponent<SpinAction>();
-        shootAction = GetComponent<ShotAction>();
         actionBaseArray = GetComponents<ActionBase>();
     }
 
@@ -56,21 +50,17 @@ public class Unit : MonoBehaviour
         }
     }
 
-    public MoveAction GetMoveAction()
+    public T GetAction<T>() where T : ActionBase
     {
-        return moveAction;
+        foreach (ActionBase baseAction in actionBaseArray)
+        {
+            if (baseAction is T)
+            {
+                return (T)baseAction;
+            }
+        }
+        return null;
     }
-
-    public SpinAction GetSpinAction()
-    {
-        return spinAction;
-    }
-
-    public ShotAction GetShootAction()
-    {
-        return shootAction;
-    }
-
 
     public GridPosition GetGridPosition()
     {
