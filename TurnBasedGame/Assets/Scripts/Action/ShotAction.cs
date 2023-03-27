@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class ShotAction : ActionBase
 {
+    [SerializeField] private LayerMask obstaclesLayerMask;
+
     public event EventHandler<OnShootEventArgs> OnShoot;
 
     public class OnShootEventArgs : EventArgs
@@ -137,6 +139,21 @@ public class ShotAction : ActionBase
                     // Both Units on same 'team'
                     continue;
                 }
+
+                Vector3 unitWorldPosition = LevelGrid.Instance.GetWorldPosition(unitGridPosition);
+                Vector3 shootDir = (targetUnit.GetWorldPosition() - unitWorldPosition).normalized;
+
+                float unitShoulderHeight = 1.7f;
+                if (Physics.Raycast(
+                        unitWorldPosition + Vector3.up * unitShoulderHeight,
+                        shootDir,
+                        Vector3.Distance(unitWorldPosition, targetUnit.GetWorldPosition()),
+                        obstaclesLayerMask))
+                {
+                    // Blocked by an Obstacle
+                    continue;
+                }
+
 
                 validGridPositionList.Add(testGridPosition);
             }
